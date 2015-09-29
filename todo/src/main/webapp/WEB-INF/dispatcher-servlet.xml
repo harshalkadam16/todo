@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <beans xmlns="http://www.springframework.org/schema/beans"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns:mvc="http://www.springframework.org/schema/mvc"
+     xmlns:context="http://www.springframework.org/schema/context"
+     xsi:schemaLocation="http://www.springframework.org/schema/mvc  http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+  
+ <mvc:annotation-driven />
+ 
+ <context:component-scan base-package="com.java.web" />
+ <context:component-scan base-package="com.java.services" />
+ <context:component-scan base-package="com.java.dao" />
+ 
+ 
+	<!-- all resources inside folder src/main/webapp/resources are mapped so 
+		they can be refered to inside JSP files (see header.jsp for more details) -->
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+
+ 	<!-- serve static resources (*.html, ...) from src/main/webapp/ -->
+	<!-- <mvc:default-servlet-handler /> -->
+ 
+ <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	 <property name="prefix">
+		 <value>/WEB-INF/views/</value>
+	 </property>
+	 <property name="suffix">
+	 	<value>.jsp</value>
+	 </property>
+ </bean>
+   
+ <bean id="todoService" class="com.java.services.TodoService"> </bean>
+ <bean id="todoDAO" class="com.java.dao.TodoDAO"> </bean>
+ 
+ <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<property name="locations">
+		<list>
+			<value>/WEB-INF/jdbc.properties</value>
+		</list>
+	</property>
+</bean>
+
+ <bean id="dataSource" class="com.java.dao.DBConnectionFactory" destroy-method="closeConnectionPool">
+	<constructor-arg name="url">
+		<value>${jdbc.url}</value>
+	</constructor-arg>
+	<constructor-arg name="userName">
+		<value>${jdbc.username}</value>
+	</constructor-arg>
+	<constructor-arg name="password">
+		<value>${jdbc.password}</value>
+	</constructor-arg>
+	<constructor-arg name="minPooledConnectioCount">
+		<value>${jdbc.min.pool.connections}</value>
+	</constructor-arg>
+	<constructor-arg name="maxPooledConnectioCount">
+		<value>${jdbc.max.pool.connections}</value>
+	</constructor-arg>
+ </bean> 
+</beans>
