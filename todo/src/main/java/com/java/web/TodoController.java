@@ -11,6 +11,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -54,25 +55,53 @@ public class TodoController {
  	}
 	
 
-/*	@RequestMapping(value = "/editTodo.htm", method = RequestMethod.GET)
-	public ModelAndView editTodo(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+	/**
+	 * 
+	 * @param id
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/editTodo.htm", method = RequestMethod.GET)
+	public ModelAndView editTodo(@RequestParam("id") String id, HttpServletRequest request, HttpServletResponse response, ModelMap model) throws Exception {
 
- 		ModelAndView view = new ModelAndView("editTodo");
-   		view.addObject("todos", todoService.getTodo(request.getParameter("id")));
+ 		ModelAndView view = new ModelAndView("addTodo");
+   		view.addObject("todo", todoService.getTodo(id));
  
 		return view;
+ 	}
+
+	/**
+	 * 
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/markCompleted", method = RequestMethod.POST)
+	@ResponseBody
+	public String mark(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws Exception {
+		String id = request.getParameter("id");
+		String status = request.getParameter("status");
+ 	  	if(todoService.markCompleted(id,status)){
+   			return "SUCCESS";
+   		}else{
+   			return "FAILURE";
+   		} 
  	}
 	
-	@RequestMapping(value = "/editTodo.htm", method = RequestMethod.POST)
-	public ModelAndView editTodo(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
-
- 		ModelAndView view = new ModelAndView("redirect:/todo/todo-list.htm");
- 		
-   		view.addObject("todos", todoService.updateTodo(request.getParameter("id")));
- 
-		return view;
- 	}
-*/	
+	/**
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/addTodo", method = RequestMethod.GET)
+  	public ModelAndView addTodo(ModelMap model) {
+		return new ModelAndView("addTodo"); 
+	}	 	
 	
 	/**
 	 * 
@@ -83,8 +112,8 @@ public class TodoController {
 	 * @return
 	 */
 	@RequestMapping(value = "/addTodo", method = RequestMethod.POST)
-	@ResponseBody
-	public String addTodo(HttpServletRequest request, HttpServletResponse response, @ModelAttribute("todoForm") TodoForm todoForm, ModelMap model) {
+	//@ResponseBody
+	public ModelAndView addTodo(HttpServletRequest request, HttpServletResponse response, @ModelAttribute("todoForm") TodoForm todoForm, ModelMap model) {
 
 	  	ITodo todo = new Todo();
 		todo.setText(todoForm.getText());
@@ -92,11 +121,18 @@ public class TodoController {
 		todo.setCreatedDate(new Date());
 		todo.setStatus(Status.PENDING.toString());
 	 	
- 	 
-		if (todoService.saveTodo(todo)) {
-			return "SUCCESS&"+todo.getId();
+		if(todoForm.getId() != null && todoForm.getId().length() > 0){
+			todo.setId(todoForm.getId());
+		}
+		
+		//todoService.saveTodo(todo);  
+		
+		 if (todoService.saveTodo(todo)) {
+			//return "SUCCESS&"+todo.getId();
+			 return new ModelAndView("redirect:/todo-list.htm");
 		}else{
-			return "SUCCESS";
+			//return "SUCCESS";
+			return new ModelAndView("redirect:/todo-list.htm");
 		} 		
  	}
 
@@ -107,12 +143,15 @@ public class TodoController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/filterTodo", method = RequestMethod.GET)
-	public ModelAndView filter(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
-
-		String filter = request.getParameter("filter");
+	@RequestMapping(value = "/todos", method = RequestMethod.GET)
+	public ModelAndView filter(@RequestParam("filter") String filter, HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+ 		  
  		ModelAndView view = new ModelAndView("todolist");
-   		view.addObject("todos", todoService.getTodoList());
+ 		if(filter.equals("ALL")){
+ 			view.addObject("todos", todoService.getTodoList());
+ 		}else{
+ 			view.addObject("todos", todoService.getFilterTodos(filter));
+ 		}
  
 		return view;
  	}	
@@ -130,7 +169,7 @@ public class TodoController {
 	public String deleteTodo(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
 
 	 	if (todoService.deleteTodo(request.getParameter("id"))) {
-			return "SUCCESS&";
+			return "SUCCESS";
 		}else{
 			return "SUCCESS";
 		} 		

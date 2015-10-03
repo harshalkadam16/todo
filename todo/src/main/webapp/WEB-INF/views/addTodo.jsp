@@ -37,21 +37,26 @@
      <div class="row">
         <div class="col-md-6">
             <div class="todolist not-done">
-             <h1>Update Todo</h1>
+             <h1>Todo</h1>
              	<!-- <div class="alert alert-success" style="display: none;">
 				  <strong>Success!</strong> Todo updated successfully.
 				</div> -->
-				<form action="/todo/editTodo.htm"  method="POST">
-					<input type="hidden" value="${todo.id}" name="id" id="id">
+				<form action="/todo/addTodo" method="POST">
+					<input type="hidden" value="${not empty todo ? todo.id : ''}" name="id" id="id">
 			 		<div class="form-group">
-						<input type="text" class="form-control" id="text" name="text" value="${todo.text}" placeholder="Enter todo here" required="required">
+						<input type="text" class="form-control" id="text" name="text" value="${not empty todo && not empty todo.text ? todo.text : ''}" placeholder="Enter todo here" required="required">
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control" id="datepicker" name="dueDate" value="${todo.dueDate}" placeholder="Select due date" required="required">
+						<input type="text" class="form-control" id="datepicker" name="dueDate" value="${not empty todo && not empty todo.dueDate ? todo.dueDate : ''}" placeholder="Select due date" required="required">
 					</div>
 					<div class="form-group">
-						<button id="addTodo" class="btn btn-success" type="submit">Update</button>
-					</div>
+							<button id="addTodo" class="btn btn-success" type="submit">
+								<c:choose>
+									<c:when test="${empty todo}"> Save </c:when>
+									<c:otherwise>Update</c:otherwise>
+								</c:choose>
+							</button>
+						</div>
 				</form>
 				<!-- <div class="todo-footer">
                    	<strong><span class="count-todos"></span></strong> Items Left
@@ -62,6 +67,6 @@
      </div>         
     </div>
    </body>
-    <%-- <spring:url value="/resources/js/todo-list.js" var="todoJs"/>
-   <script src="${todoJs}"></script>  --%>
+    <spring:url value="/resources/js/todo-list.js" var="todoJs"/>
+    <script src="${todoJs}"></script> 
 </html>

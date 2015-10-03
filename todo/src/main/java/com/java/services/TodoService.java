@@ -36,10 +36,43 @@ public class TodoService {
 	 	return todoDAO.getTodoList();
 	}
 
-
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public boolean deleteTodo(String id) {
 		 return todoDAO.deleteTodo(id);
 	}
-	
- }
 
+
+	/**
+	 * 
+	 * 
+	 * @param id
+	 * @return
+	 * 
+	 * @throws Exception
+	 */
+	public Todo getTodo(String id) throws Exception {
+		 return todoDAO.getTodo(id);
+	}
+
+
+	/**
+	 * 
+	 * @param id
+	 * @param status
+	 * @return
+	 */
+	public boolean markCompleted(String id, String status) {
+ 		return todoDAO.markCompleted(id,status);
+	}
+
+
+	public List<Todo> getFilterTodos(String filter) {
+		// TODO Auto-generated method stub
+		return todoDAO.getFilterTodos(filter);
+	}  
+ }

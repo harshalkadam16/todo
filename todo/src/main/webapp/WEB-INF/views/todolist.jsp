@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -35,7 +36,7 @@
 	<body>
   	<div class="container">
      <div class="row">
-        <div class="col-md-6">
+        <!-- <div class="col-md-6">
             <div class="todolist not-done">
              <h1>Add Todo</h1>
              	<div class="alert alert-success" style="display: none;">
@@ -51,17 +52,23 @@
 					<button id="addTodo" class="btn btn-success">Add</button>
 				</div>
 
-				<!-- <div class="todo-footer">
+				<div class="todo-footer">
                    	<strong><span class="count-todos"></span></strong> Items Left
-                </div> -->
+                </div>
             </div>
-        </div>
+        </div> -->
         <div class="col-md-6">
             <div class="todolist">
+            	<div class="alert alert-success" style="display: none;">
+				  <strong>Success!</strong> Todo mark completed successfully.
+				</div>
                <h1>Todo Items</h1>
 	           <div class="col-lg-6">
 					<div class="form-group">
-						<select class="form-control" id="filter">
+					   <form action="/todos" method="get" id="filterForm">
+					   	<input name="filter" value="" type="hidden">
+					   </form>
+						<select class="form-control" id="filtr">
 							<option value="ALL" selected="selected">ALL</option>
 							<option value="Completed">Completed</option>
 							<option value="Pending">Pending</option>
@@ -69,27 +76,34 @@
 					</div>
 				</div>
 				<div class="col-lg-6">
-				    <div class="input-group">
+				    <!-- <div class="input-group">
 				      <input type="text" class="form-control" placeholder="Search for...">
 				      <span class="input-group-btn">
 				        <button class="btn btn-default" type="button">Go!</button>
 				      </span>
-				    </div><!-- /input-group -->
+				    </div> --><!-- /input-group -->
 				</div><!-- /.col-lg-6 -->
 				<div class="col-lg-12">
-	                <ul id="done-items" class="list-unstyled">
+	                <ul class="list-unstyled" id="done-items">
 	                 	<c:forEach var="todo" items="${todos}" varStatus="cnt">
-						  		                 	
-						  <li id="todo${cnt.index}"> ${todo.text}  <fmt:formatDate type="date" value="${todo.dueDate}" /> <%-- ${todo.status} --%>
+	                 	    <li id="todo${cnt.index}">
+	                 	    <c:choose>
+	                 	    	<c:when test="${todo.status eq 'PENDING'}">
+	                 	    	  <input type="checkbox" value="Completed" id="mark${cnt.index}" onchange="mark('${cnt.index}');">
+	                 	    	</c:when>
+	                 	    	<c:otherwise>
+	                 	    	  <input type="checkbox" value="Pending" id="mark${cnt.index}" onchange="mark('${cnt.index}');" checked="checked">
+	                 	    	</c:otherwise>
+	                 	    </c:choose>
+	                 	      
+						    ${todo.text}  <fmt:formatDate type="date" value="${todo.dueDate}" /> <%-- ${todo.status} --%>
 	                      <form action="/todo/editTodo.htm" id="form${cnt.index}">
-	                      	<input type="hidden" id="id${cnt.index}" name="id" value="${todo.id}"/>
+	                      	<input type="hidden" id="id${cnt.index}" name="id" value="${fn:replace(todo.id,'#','')}"/>
 	                      </form>
 	                      <button class="edit-item btn btn-default btn-xs pull-right" onclick="$('#form${cnt.index}').submit();">
 	                         <span class="glyphicon glyphicon-edit"> </span>
 	                      </button>
-	                      &nbsp;&nbsp;
-	                      
-	                      <button class="remove-item btn btn-default btn-xs pull-right" id="deleteTodo('id${cnt.index}');">
+	                      <button class="remove-item btn btn-default btn-xs pull-right" id="deleteTodo('${cnt.index}');">
 	                      <span class="glyphicon glyphicon-remove"></span></button>
 	                    </li>
 	                   </c:forEach> 
@@ -99,8 +113,8 @@
         </div>
      </div>
     </div>
-   </body>
-   
+    
    <spring:url value="/resources/js/todo-list.js" var="todoJs"/>
-   <script src="${todoJs}"></script> 
+   <script src="${todoJs}"></script>
+   </body>    
 </html>

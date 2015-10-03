@@ -6,8 +6,14 @@
           minDate: dateToday
       });
   });
-		  
-$("#addTodo").click(function(){
+  
+   
+  $("#filter").change(function(){
+	   $('#filter').val($('#filtr').val());
+	   $('#filterForm').submit();
+  });
+  
+/*$("#addTodo").click(function(){
  if(validate('text') && validate('datepicker'))
 	$.ajax({
 		url: "/todo/addTodo",
@@ -25,7 +31,8 @@ $("#addTodo").click(function(){
  		}
 	}); 
 });
- 
+*/
+  
 $("#filter").change(function(){
   	$.ajax({
 		url: "/todo/filterTodo",
@@ -41,15 +48,20 @@ $("#filter").change(function(){
 	}); 
 });
 
+/**
+ * 
+ * @param ele
+ */
 function deleteTodo(ele){
   	$.ajax({
 		url: "/todo/deleteTodo",
 		async: false,
 		type : "POST",
-		data :{  id : $('#'+ele).val(), },
+		data :{  id : $('#id'+ele).val() },
 		success: function(response){
 			if(response == "SUCCESS")
-				alert("item deleted");
+				$('#todo'+ele).remove();
+				//alert("item deleted");
 			else
 				alert("item was not deleted");
 			  //$(".alert-success").show();
@@ -60,7 +72,27 @@ function deleteTodo(ele){
 	}); 
 }  
 
-
+function mark(ele){
+   	$.ajax({
+ 		url: "/todo/markCompleted",
+ 		async: false,
+ 		type : "POST",
+ 		data :{ id : $('#todo'+ele).val() , status : $('#mark'+ele).val() },
+ 		success: function(result){
+ 			$(".alert-success").show();
+ 			$('#mark'+ele).attr('checked','checked');
+ 	 	},
+ 		error: function(xhr){
+  			console.log("error in todo/markCompleted :"+xhr);
+  		}
+ 	}); 
+} 
+ 
+/**
+ * 
+ * @param ele
+ * @returns {Boolean}
+ */
 function validate(ele){
 	if($('#'+ele).val() == "" && $('#'+ele).val().length == 0){
 		$('#'+ele).css("border-color","red");
